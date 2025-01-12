@@ -1,0 +1,11 @@
+:root {
+  --primary: #DA0C81;
+  --secondary: #E95793;
+  --bgColor : #f9f8f8;
+  --gray : #ECECEC;
+}
+
+.errTxt {
+  color: red;
+  font-size: 13px;
+}

@@ -1,0 +1,16 @@
+.main {
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--bgColor);
+}
+
+.form {
+    border-radius: 10px;
+    padding: 50px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    /* background-color: var(--gray); */
+}
+
+.title {
+    color: var(--primary);
+}
