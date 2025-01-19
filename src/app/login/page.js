@@ -8,11 +8,24 @@ import FormikError from "@/sharedComponent/FormikError";
 import styles from "../signup/page.module.css";
 import { loginInitialValues, loginValidationSchema } from "@/helper";
 import Link from "next/link";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
-
-    const handleSubmit = (values) => {
-        console.log('values' , values)
+const router = useRouter();
+    const handleSubmit = async (values) => {
+      await axios
+      .post("http://localhost:5000/api/auth/login", {
+        email: values?.email,
+        password: values?.password,
+      })
+      .then((data) => {
+        localStorage.setItem('auth_token' , data.data.token);
+        router.push("/");
+      })
+      .catch((error) => {
+        console.log("error logging in", error);
+      });
     }
 
     return (
@@ -61,11 +74,11 @@ const Login = () => {
                   <FormikError error={errors?.password} />
                 )}
               </div>
-              <FormikButton type="submit" text="Sign Up" />
+              <FormikButton type="submit" text="Log in" />
               <div className="d-flex flex-row">
                 <p>Don't have an account?</p>
                 <Link className="mx-1" href={"/signup"}>
-                  Sign Up
+                  Sign up
                 </Link>
               </div>
             </form>

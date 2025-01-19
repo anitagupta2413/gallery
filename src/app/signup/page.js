@@ -1,5 +1,4 @@
 "use client";
-
 import React from "react";
 import { Formik } from "formik";
 import {
@@ -11,10 +10,25 @@ import styles from "./page.module.css";
 import FormikButton from "@/sharedComponent/FormikButton";
 import Link from "next/link";
 import FormikError from "@/sharedComponent/FormikError";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 const SignUp = () => {
-  const handleSubmit = (values) => {
-    console.log('values' , values)
+  const router = useRouter();
+  const handleSubmit = async (values) => {
+    await axios
+      .post("http://localhost:5000/api/auth/signup", {
+        name: values?.name,
+        email: values?.email,
+        password: values?.password,
+      })
+      .then((data) => {
+        localStorage.setItem('auth_token' , data.data.token);
+        router.push("/");
+      })
+      .catch((error) => {
+        console.log("error signing in", error);
+      });
   };
 
   return (
@@ -27,7 +41,7 @@ const SignUp = () => {
         onSubmit={handleSubmit}
         validateOnSubmit={true}
       >
-        {({ values, setFieldValue, errors ,handleSubmit}) => (
+        {({ values, setFieldValue, errors, handleSubmit }) => (
           <form
             onSubmit={handleSubmit}
             className={`d-flex flex-column gap-3 justify-content-center align-items-center ${styles.form}`}

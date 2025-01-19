@@ -2,21 +2,24 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const userRouter = require('./routes/auth/index');
+const dotenv = require('dotenv');
 
 
 const app = express();
-const PORT = 8080;
-
-//Mongodb URI
-const mongodb_connection_string = 'mongodb://localhost:27017/Gallery';
+const PORT = 5000;
 
 //Middlewares
 app.use(cors());
 app.use(bodyParser.json());
+dotenv.config();
+
+//routes
+app.use('/api/auth', userRouter);
 
 //mongodb connection
 mongoose
-  .connect(mongodb_connection_string , { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(process.env.MONGODB_CONNECTION_STRING , { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     console.log("Database connected");
   })
