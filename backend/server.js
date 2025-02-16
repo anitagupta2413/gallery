@@ -4,15 +4,21 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const userRouter = require('./routes/auth/index');
 const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser')
 
-
+dotenv.config();
 const app = express();
 const PORT = 5000;
 
 //Middlewares
-app.use(cors());
+app.use(cors(
+  {
+    origin: "http://localhost:3000", // Example: "http://localhost:3000"
+    credentials: true, // Allows cookies
+  }
+));
 app.use(bodyParser.json());
-dotenv.config();
+app.use(cookieParser());
 
 //routes
 app.use('/api/auth', userRouter);

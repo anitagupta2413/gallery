@@ -12,22 +12,27 @@ import Link from "next/link";
 import FormikError from "@/sharedComponent/FormikError";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 const SignUp = () => {
   const router = useRouter();
-  const handleSubmit = async (values) => {
-    await axios
-      .post("http://localhost:5000/api/auth/signup", {
-        name: values?.name,
-        email: values?.email,
-        password: values?.password,
-      })
-      .then((data) => {
-        localStorage.setItem('auth_token' , data.data.token);
-        router.push("/");
+  const handleSubmit = (values) => {
+    axios
+      .post(
+        `${process.env.NEXT_PUBLIC_APP_API_URL}/api/auth/signup`,
+        {
+          name: values?.name,
+          email: values?.email,
+          password: values?.password,
+        },
+        { withCredentials: true } // ✅ Allows cookies to be sent & received
+      )
+      .then((response) => {
+        toast.success("Signup successful! Redirecting...");
+          router.push("/");
       })
       .catch((error) => {
-        console.log("error signing in", error);
+        toast.error("Signup failed");
       });
   };
 

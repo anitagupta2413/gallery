@@ -13,20 +13,22 @@ import { useRouter } from "next/navigation";
 
 const Login = () => {
 const router = useRouter();
-    const handleSubmit = async (values) => {
-      await axios
-      .post("http://localhost:5000/api/auth/login", {
+const handleSubmit = async (values) => {
+  try {
+    await axios.post(
+      `${process.env.APP_API_URL}/api/auth/login`,
+      {
         email: values?.email,
         password: values?.password,
-      })
-      .then((data) => {
-        localStorage.setItem('auth_token' , data.data.token);
-        router.push("/");
-      })
-      .catch((error) => {
-        console.log("error logging in", error);
-      });
-    }
+      },
+      { withCredentials: true } // ✅ Allows cookies to be sent & received
+    );
+
+    router.push("/"); // ✅ Redirect to home after login
+  } catch (error) {
+    console.error("Error logging in", error);
+  }
+};
 
     return (
         <div
