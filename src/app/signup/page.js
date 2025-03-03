@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { Formik } from "formik";
 import {
   signupInitialValues,
@@ -10,30 +10,37 @@ import styles from "./page.module.css";
 import FormikButton from "@/sharedComponent/FormikButton";
 import Link from "next/link";
 import FormikError from "@/sharedComponent/FormikError";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { useSignupMutation } from "../../../apislices/AuthSlice";
+import { useDispatch } from "react-redux";
+import { signUp } from "../../../store/reducers/AuthReducers";
+import { useAuth } from "@/hooks/useAuthh";
 
 const SignUp = () => {
+  const {user} = useAuth();
+  const dispatch = useDispatch();
+  const [userSignup , {isLoading}] = useSignupMutation();
   const router = useRouter();
-  const handleSubmit = (values) => {
-    axios
-      .post(
-        `${process.env.NEXT_PUBLIC_APP_API_URL}/api/auth/signup`,
-        {
-          name: values?.name,
-          email: values?.email,
-          password: values?.password,
-        },
-        { withCredentials: true } // ✅ Allows cookies to be sent & received
-      )
-      .then((response) => {
-        toast.success("Signup successful! Redirecting...");
-          router.push("/");
-      })
-      .catch((error) => {
-        toast.error("Signup failed");
-      });
+
+  useEffect(() => {
+    if(user){
+      router.replace("/");
+    }
+  } , [user])
+  
+  const handleSubmit = async (values) => {
+    try {
+      const response = await userSignup(values);
+
+      if(response?.data?.user){
+        dispatch(signUp(response?.data?.user));
+        router.push("/");
+      }
+    }
+    catch(error) {
+      console.error(error);
+    }
   };
 
   return (

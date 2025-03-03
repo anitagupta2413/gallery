@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Formik } from "formik";
 import FormikButton from "@/sharedComponent/FormikButton";
 import FormikInput from "@/sharedComponent/FormikInput";
@@ -8,23 +8,32 @@ import FormikError from "@/sharedComponent/FormikError";
 import styles from "../signup/page.module.css";
 import { loginInitialValues, loginValidationSchema } from "@/helper";
 import Link from "next/link";
-import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { useLoginMutation } from "../../../apislices/AuthSlice";
+import { login } from "../../../store/reducers/AuthReducers";
+import { useAuth } from "@/hooks/useAuthh";
 
 const Login = () => {
+const {user} = useAuth();
 const router = useRouter();
+const dispatch = useDispatch();
+const [userLogin , {isLoading}] = useLoginMutation();
+
+
+useEffect(() => {
+  if(user){
+    router.replace("/");
+  }
+} , [user])
+
 const handleSubmit = async (values) => {
   try {
-    await axios.post(
-      `${process.env.APP_API_URL}/api/auth/login`,
-      {
-        email: values?.email,
-        password: values?.password,
-      },
-      { withCredentials: true } // ✅ Allows cookies to be sent & received
-    );
-
-    router.push("/"); // ✅ Redirect to home after login
+    const response = await userLogin(values);
+    if(response?.data?.user) {
+      dispatch(login(response?.data?.user));
+      router.push("/");
+    }
   } catch (error) {
     console.error("Error logging in", error);
   }

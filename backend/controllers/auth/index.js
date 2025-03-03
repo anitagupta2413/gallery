@@ -30,7 +30,7 @@ const userSignup = async (req, res) => {
 
     res
       .status(201)
-      .json({ message: "User Registered Successfully"});
+      .json({ message: "User Registered Successfully" , user : newUser});
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
   }
@@ -65,7 +65,7 @@ const userLogin = async (req, res) => {
 
     res
       .status(201)
-      .json({ message: "User Logged In Successfully"});
+      .json({ message: "User Logged In Successfully" , user : user });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
   }
@@ -73,18 +73,28 @@ const userLogin = async (req, res) => {
 
 const userVerification = async (req, res) => {
   const authToken = req.cookies.authToken;
-  if(!authToken) {
+  
+  if (!authToken) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
   try {
-    jwt.verify(authToken, process.env.JWT_TOKEN_SECRET_KEY);
-    res.status(200).json({ message: "Authenticated" });
-  }
-  catch (error) {
+    // ✅ Decode the token to get user info
+    const decoded = jwt.verify(authToken, process.env.JWT_TOKEN_SECRET_KEY);
+
+    // ✅ Fetch the user from the database
+    const user = await User.findById(decoded.userId).select("-password"); // Exclude password
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ message: "Authenticated", user });
+  } catch (error) {
     res.status(401).json({ message: "Invalid token" });
   }
-}
+};
+
 
 const userLogout = async (req, res) => {
   try {

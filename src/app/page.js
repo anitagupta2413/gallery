@@ -5,45 +5,38 @@ import { toast } from "react-toastify";
 import { ToastContainer } from "react-bootstrap";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-
+import {
+  useLogoutMutation,
+  useDeleteUserMutation,
+  useGetUserQuery,
+} from "../../apislices/AuthSlice";
+import { useDispatch } from "react-redux";
+import {
+  deleteUser,
+  logout,
+  setUser,
+} from "../../store/reducers/AuthReducers";
+import { useAuth } from "@/hooks/useAuthh";
 export default function Home() {
+  const { user } = useAuth();
   const router = useRouter();
+  const dispatch = useDispatch();
+  const [userLogoutAPI, { isLoggingOut }] = useLogoutMutation();
+  const [userDeleteAPI, { isDeleting }] = useDeleteUserMutation();
 
-  const [authenticated, setAuthenticated] = useState(false);
+  const {data : userr , isSuccess} = useGetUserQuery();
 
   useEffect(() => {
-    const verifyUser = async () => {
-      console.log("this works");
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_APP_API_URL}/api/auth/verify-user`,
-          {
-            withCredentials: true,
-          }
-        );
-        if (response?.data?.message) {
-          setAuthenticated(true);
-        } else {
-          setAuthenticated(false);
-        }
-      } catch (error) {
-        toast.error(error);
-      }
-    };
-
-    verifyUser();
-  }, []);
+    if(isSuccess && userr){
+      dispatch(setUser(userr));
+    }
+  }, [userr , dispatch , isSuccess])
 
   const userLogout = async () => {
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_APP_API_URL}/api/auth/user-logout`,
-        { withCredentials: true }
-      );
-
-      if (response.status === 200) {
-        router.push("/login");
-      }
+      const response = await userLogoutAPI();
+      dispatch(logout());
+      router.push("/login");
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -51,13 +44,8 @@ export default function Home() {
 
   const userDelete = async () => {
     try {
-      const response = await axios.delete(
-        `${process.env.NEXT_PUBLIC_APP_API_URL}/api/auth/user-delete`,
-        { withCredentials: true }
-      );
-      if (response.status === 200) {
-        router.push("/signup");
-      }
+      const response = await userDeleteAPI();
+      dispatch(deleteUser());
     } catch (error) {
       console.error(
         "Failed to delete user:",
@@ -66,7 +54,7 @@ export default function Home() {
     }
   };
 
-  if (!authenticated) return <SignUp />;
+  if (!user) return <SignUp />;
   return (
     <div>
       <div>Hello world</div>
