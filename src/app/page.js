@@ -17,6 +17,8 @@ import {
   setUser,
 } from "../../store/reducers/AuthReducers";
 import { useAuth } from "@/hooks/useAuthh";
+import PlusIcon from "@/svgicons/PlusIcon";
+import Profile from "./Profile/Page";
 export default function Home() {
   const { user } = useAuth();
   const router = useRouter();
@@ -61,6 +63,7 @@ export default function Home() {
       <button onClick={userLogout}>Log out</button>
       <button onClick={userDelete}>user delete</button>
       <ToastContainer position="top-right" />
+      <Profile/>
     </div>
   );
 }

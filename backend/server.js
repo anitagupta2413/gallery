@@ -3,8 +3,11 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const userRouter = require('./routes/auth/index');
+const imageRouter = require('./routes/imageUpload/index')
 const dotenv = require('dotenv');
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
+const multer = require('multer');
+const awsSdk = require('aws-sdk');
 
 dotenv.config();
 const app = express();
@@ -22,6 +25,7 @@ app.use(cookieParser());
 
 //routes
 app.use('/api/auth', userRouter);
+app.use('/api/image' , imageRouter);
 
 //mongodb connection
 mongoose
